@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+	<html lang="zh_cn">
+<head>
+		<meta charset="UTF-8">
+		<title>{{ title }}</title>
+	</head>
+<body>
+	<title>{{ title }}</title>
+</body>
+</html>

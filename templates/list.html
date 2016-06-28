@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+    <meta charset="UTF-8">
+    <title>搜索结果:{{keywords}}</title>
+</head>
+<link href="//cdn.bootcss.com/bootstrap/3.3.5/css/bootstrap.css" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='list.css') }}">
+<body>
+    <h2><span class="search-keywords">{{ keywords }}</span>的搜索结果是:</h2>
+    <ul class="result-list">
+    {% for row in results.data %}
+        <li>
+        <h4><a href="{{ row.url }}">{{ row.hit_title|safe }}</a><small>({{ row.publish_time }})</small></h4>
+        <p style="display: none">命中词语:{{ row.hit_keywords }}</p>
+        <div class="content">
+            {{ row.hit_body|safe }}
+        </div>
+      </li>
+    {% endfor %}
+    </ul>
+    {% import "block_page.html" as page %}
+    {{ page.pager('/search/'+keywords, results.total, results.size, results.page) }}
+</body>
+</html>

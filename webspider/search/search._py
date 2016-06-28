@@ -1,0 +1,114 @@
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+import sys
+from whoosh.index import open_dir
+from whoosh.fields import *
+from whoosh.qparser import QueryParser, MultifieldParser
+from jieba.analyse import ChineseAnalyzer
+from whoosh import scoring, sorting
+from whoosh.query import *
+# import cgi
+import HTMLParser
+
+# sys.path.append("../")
+
+# analyzer = ChineseAnalyzer()
+ix = open_dir("./sindex")  # for read only
+
+# inputstring = "中国and(国际or物流)and开幕"
+# inputstring = "12 string english"
+# inputstring = "中国国际物流节开幕"
+# keywords = []
+# for t in analyzer(inputstring):
+#     keywords.append(t.text)
+# keywords = inputstring.split(" ")
+# keywordstr = " ".join(keywords)
+
+# searcher = ix.searcher(weighting=scoring.TF_IDF())
+# parser = QueryParser("body", schema=ix.schema)
+
+# for keyword in keywords:
+#     print("result of %s" % keyword)
+#     print(keyword)
+#     q = parser.parse(keyword)
+#     results = searcher.search(q, terms=True)
+#     for hit in results:
+#         print(hit['title'])
+#     print("="*10)
+
+# qp = QueryParser("title", schema=ix.schema)
+# qp = MultifieldParser(["title", "body"], schema=ix.schema)
+# with ix.searcher(weighting=scoring.TF_IDF()) as searcher:
+#     # q = qp.parse(keywordstr)
+#     # terms_list = [terms for terms in q.terms()]
+#     # print(terms_list)
+#     # querystring = Or(terms_list)
+#     # querystring = And([Term("title", "中国"), Term("title", "国际"), Term("title", "物流"), Term("title", "国际物流节"), Term("title", "开幕")])
+#     # print(q)
+#     # querystring = Or([Term("body", word) for word in keywords])
+#     querystring = qp.parse(inputstring)
+#     results = searcher.search(querystring, terms=True, limit=100, collapse_limit=1)
+#     return_list = []
+#     ret = []
+#     for i in xrange(len(results)):
+#         tmpret = results[i].fields()
+#         tmpret['words'] = results[i].matched_terms()
+#         ret.append(tmpret)
+#     print ret
+
+
+def search(inputstring=None, page=1, size=10):
+    inputstring = unicode(inputstring)
+    publish_time = sorting.FieldFacet("publish_time", reverse=True)
+    qp = MultifieldParser(["title", "body"], schema=ix.schema)
+    with ix.searcher(weighting=scoring.TF_IDF()) as searcher:
+        querystring = qp.parse(inputstring)
+        results = searcher.search(querystring, terms=True, limit=None, sortedby=[publish_time])
+        # results = searcher.search_page(querystring, page)
+        res = []
+        html_parser = HTMLParser.HTMLParser()
+        if len(results) > 0:
+            for i in xrange((page-1)*size, page*size):
+                # for i in xrange(len(results)):
+                #     tmpret = results[i].fields()
+                #     # tmpret = {}
+                #     tmpret['words'] = results[i].matched_terms()
+                #     ret.append(tmpret)
+                if i in xrange(len(results)):
+                    tmpret = results[i].fields()
+                    hit_keywords = set()
+                    for key, val in results[i].matched_terms():
+                        hit_keywords.add(val.decode('utf-8'))
+                    tmpret['words'] = results[i].matched_terms()
+                    tmpret['hit_keywords'] = " ".join(list(hit_keywords))
+                    tmpret['hit_title'] = html_parser.unescape(results[i].highlights('title').decode('utf-8')).decode('unicode_escape') if results[i].highlights('title') else results[i]['title']
+                    print html_parser.unescape(results[i].highlights('title').encode('utf-8'))
+                    # tmpret['hit_body'] = results[i].highlights('body')
+                    res.append(tmpret)
+    page_info = {'total': len(results), 'page': page, 'size': size, 'data': res}
+    return page_info
+
+
+# def search_page(inputstring=None, page=1, size=10):
+#     qp = MultifieldParser(["title", "body"], schema=ix.schema)
+#     with ix.searcher(weighting=scoring.TF_IDF()) as searcher:
+#         querystring = qp.parse(inputstring)
+#         # results = searcher.search(querystring, terms=True, limit=None)
+#         results = searcher.search_page(querystring, page, size)
+#         ret = []
+#         print(results)
+#         # for i in xrange(size):
+#         #     tmpret = results[i].fields()
+#         #     # tmpret = {}
+#         #     tmpret['words'] = results[i].matched_terms()
+#         #     ret.append(tmpret)
+#     page_info = {}
+#     page_info['total'] = results.docnum()
+#     page_info['page'] = page
+#     page_info['size'] = size
+#     page_info['data'] = ret
+#     return page_info
+
+if __name__ == '__main__':
+    ret = search("四川")
+    print(ret)

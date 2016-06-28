@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>Admin - Bootstrap Admin Template</title>
+    {% include 'public_css.html' %}
+</head>
+<body>
+    <div id="wrapper">
+        <!-- Navigation -->
+        {% include 'public_nav.html' %}
+
+        <div id="page-wrapper">
+
+            <div class="container-fluid">
+
+                <!-- Page Heading -->
+                <div class="row">
+                    <div class="col-lg-12">
+                        <h1 class="page-header">
+                            频道
+                        </h1>
+                        <ol class="breadcrumb">
+                            <li>
+                                <i class="fa fa-dashboard"></i>  <a href="index.html">控制台</a>
+                            </li>
+                            <li class="active">
+                                <i class="fa fa-bar-chart-o"></i> 频道
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>编号</th>
+                                        <th>名字</th>
+                                        <th>排序</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in list %}
+                                    <tr>
+                                        <td>{{ item.id }}</td>
+                                        <td>{{ item.name }}</td>
+                                        <td>{{ item.sort }}</td>
+                                        <td><a herf="/editc?id={{ item.id }}">编辑</a><a herf="/delc?id={{ item.id }}">删除</a></td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.row -->
+            </div>
+            <!-- /.container-fluid -->
+
+        </div>
+        <!-- /#page-wrapper -->
+
+    </div>
+    <!-- /#wrapper -->
+
+
+    {% include 'public_js.html' %}
+
+    <!-- Flot Charts JavaScript -->
+    <!--[if lte IE 8]><script src="{{ url_for('static', filename='js/excanvas.min.js') }}"></script><![endif]-->
+    <script src="{{ url_for('static', filename='js/plugins/flot/jquery.flot.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/plugins/flot/jquery.flot.tooltip.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/plugins/flot/jquery.flot.resize.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/plugins/flot/jquery.flot.pie.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/plugins/flot/flot-data.js') }}"></script>
+
+</body>
+
+</html>

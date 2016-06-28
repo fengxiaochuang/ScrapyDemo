@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+    <meta charset="UTF-8">
+    <title>搜索结果:{{keywords}}</title>
+</head>
+<body>
+    <title>{% block keywords %}{% endblock %}的搜索结果是:</title>
+    <ul>
+    {% for row in results.data %}
+        <li>
+        <p><a href="{{ row.url }}">{{ row.hit_title|e }}</a>({{ row.publish_time }})</p>
+        <p>命中词语:{{ row.hit_keywords }}</p>
+        <p>命中文本:{{ row.hit }}</p>
+      </li>
+    {% endfor %}
+    </ul>
+    <p>一共{{ results.total }}项,每页{{ results.size }}项,当前第{{ results.page }}页</p>
+</body>
+</html>
